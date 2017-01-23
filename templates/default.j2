@@ -1,0 +1,31 @@
+# ansible managed
+# do not edit from there !
+
+DEFAULT vesamenu.c32 
+#DEFAULT menu.c32
+TIMEOUT 600
+ONTIMEOUT continue
+MENU INCLUDE pxelinux.cfg/pxe.conf
+
+LABEL continue
+	MENU LABEL ** Continue boot next device
+	LOCALBOOT 0
+
+LABEL reboot
+	MENU LABEL ** Reboot
+	KERNEL reboot.c32
+
+LABEL poweroff
+	MENU LABEL ** Poweroff
+	KERNEL poweroff.c32
+
+{% for maintitle in tftp_pxe_mainmenu %}
+MENU BEGIN {{ loop.index }}
+MENU TITLE {{ maintitle.name }}
+	LABEL Previous
+	MENU LABEL Previous menu
+        MENU EXIT
+        MENU SEPARATOR
+	MENU INCLUDE pxelinux.cfg/{{ maintitle.file }} 
+MENU END
+{% endfor %}

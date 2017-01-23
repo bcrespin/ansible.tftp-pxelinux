@@ -1,0 +1,80 @@
+---
+# tasks file for ansible.tftp-syslinux
+
+- name: ensure tftp folder exist
+  file: path={{ item }} state=directory
+  with_items:
+    - "{{ tftp_folder }}"
+    - "{{ tftp_folder }}/pxe_images" 
+    - "{{ tftp_folder }}/pxelinux.cfg"
+
+- name: download syslinux zip file
+  command: ftp {{ tftp_syslinux_url }}
+  args:
+    chdir: "{{ tftp_folder }}"
+    creates: "{{ tftp_folder }}/syslinux-{{ tftp_syslinux_version }}.zip"
+
+- name: store syslinux version in info file
+  copy: content="{{ tftp_syslinux_version }}\r\n" dest={{ tftp_folder }}/syslinux-version.txt
+  register: res
+
+- name: list all syslinux previous version files
+  find: paths="{{ tftp_folder }}" patterns="*.c32,memdisk,lpxelinux.0"
+  when: res.changed
+  register: old
+
+#- name: debug old files
+#  debug: msg="{{ old.files|default('') }}"
+
+- name: remove old syslinux files
+  file: path="{{ item.path }}" state=absent
+  with_items: "{{ old.files|default('') }}"
+  when: res.changed
+
+- name: extract files
+  command: unzip -j -x syslinux-{{ tftp_syslinux_version }}.zip {{ item }} 
+  args:
+    chdir: "{{ tftp_folder }}"
+  with_items: 
+    - "*bios/*/lpxelinux.0"
+    - "*bios/*/ldlinux.c32"
+    - "*bios/com32/menu*.c32"
+    - "*bios/com32/modules/*.c32"
+    - "*memdisk/memdisk"
+  when: res.changed
+
+- name: copy pxe required files
+  with_items:
+    - "fr.ktl"
+    - "background.png"
+  copy: src="{{ role_path }}/files/{{ item }}" dest="{{ tftp_folder }}/pxelinux.cfg/{{ item }}" 
+ 
+- name: generated pxelinux file
+  template: src="{{ item }}.j2" dest="{{ tftp_folder }}/pxelinux.cfg/{{ item }}"
+  with_items:
+    - "pxe.conf"
+    - "default"
+
+#- name: debug
+#  debug: msg="{{ item.1.url|default('')}}"
+#  with_subelements:
+#    - "{{ tftp_pxe_mainmenu }}"
+#    - images
+
+- name: download images that need to be
+  command: "ftp {{ item.1.url }}/{{ item.1.filename }}"
+  args:
+    chdir: "{{ tftp_folder }}/pxe_images"
+    creates: "{{ tftp_folder }}/pxe_images/{{ item.1.filename }}"
+  with_subelements:
+    - "{{ tftp_pxe_mainmenu }}"
+    - images
+  when: item.1.url is defined
+
+- name: generate pxe file
+  template: src=pxe_submenu.j2  dest="{{ tftp_folder }}/pxelinux.cfg/{{ item.file }}"
+  with_items:
+    - "{{ tftp_pxe_mainmenu }}"
+
+- name: enable tftp service
+  service: name=tftpd state=started enabled=yes

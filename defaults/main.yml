@@ -3,4 +3,20 @@
 tftp_syslinux_version: "6.04-pre1"
 tftp_syslinux_url: "https://www.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.04/syslinux-6.04-pre1.zip"
 tftp_folder: "/tftpboot"
-
+tftp_pxe_menu_title: "Boot PXE @home"
+tftp_pxe_keymap: "fr.ktl"
+tftp_pxe_timeout : 120
+tftp_pxe_background_img: "background.png"
+tftp_pxe_mainmenu:
+  - name: "Hardware diagnostics & tools"
+    file: hardware
+    images: "{{ pxe_images_hardware|default([]) }}" 
+  - name: "Backup, imagining & partition tools"
+    file: imaging
+    images: "{{ pxe_images_imaging|default([]) }}"
+  - name: "Antivirus"
+    file: antivirus
+    images: "{{ pxe_images_antivirus|default([]) }}"
+  - name: "(Live/Install) OS"
+    file: os
+    images: "{{ pxe_images_os|default([]) }}"

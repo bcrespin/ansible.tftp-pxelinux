@@ -1,0 +1,16 @@
+# ansible managed
+# do not edit from othere
+#
+{% set list=item.images %}
+{% for entry in list %}
+LABEL {{ loop.index }}
+        MENU LABEL ^{{ loop.index }}. {{ entry.name }}
+        KERNEL {{ entry.kernel }}
+{% if entry.initrd is defined %}
+        INITRD {{ entry.initrd }}
+{% endif %}
+{% if entry.append is defined %}
+        APPEND {{ entry.append }}
+{% endif %}
+{% endfor %}
+

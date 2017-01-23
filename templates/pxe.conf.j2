@@ -1,0 +1,18 @@
+# ansible managed
+# do not edit from there !
+
+menu title {{ tftp_pxe_menu_title }}
+{% if pxe_keymap is defined %}
+KBDMAP pxelinux.cfg/{{ tftp_pxe_keymap }}
+{% endif %}
+TIMEOUT {{ tftp_pxe_timeout }}
+MENU BACKGROUND  pxelinux.cfg/{{ tftp_pxe_background_img }}
+
+ALLOWOPTIONS 1
+
+menu color title        * #FFFFFFFF *
+menu color border       * #00000000 #00000000 none
+menu color sel          * #ffffffff #ffe00100 *
+menu color hotsel       1;7;37;40 #ffffffff #ffe00100 *
+menu color tabmsg       * #ffffffff #00000000 *
+menu color help 37;40 #ffdddd00 #00000000 none
