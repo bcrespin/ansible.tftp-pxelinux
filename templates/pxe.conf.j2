@@ -6,7 +6,7 @@ menu title {{ tftp_pxe_menu_title }}
 KBDMAP pxelinux.cfg/{{ tftp_pxe_keymap }}
 {% endif %}
 TIMEOUT {{ tftp_pxe_timeout }}
-MENU BACKGROUND  pxelinux.cfg/{{ tftp_pxe_background_img }}
+MENU BACKGROUND  {{ tftp_pxe_background_img }}
 
 ALLOWOPTIONS 1
 

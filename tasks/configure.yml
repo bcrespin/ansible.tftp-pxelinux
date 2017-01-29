@@ -38,6 +38,8 @@
   with_items: 
     - "*bios/*/lpxelinux.0"
     - "*bios/*/ldlinux.c32"
+    - "*bios/*/libcom32.c32"
+    - "*bios/*/libutil.c32"
     - "*bios/com32/menu*.c32"
     - "*bios/com32/modules/*.c32"
     - "*memdisk/memdisk"
