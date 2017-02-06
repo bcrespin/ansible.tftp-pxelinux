@@ -1,38 +1,55 @@
 Role Name
 =========
-
-A brief description of the role goes here.
+install & configure a pxe server, menu customizable based on syslinux 
+for now, only OpenBSD supported, but other Os support should be easy
 
 Requirements
 ------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+none
 
 Role Variables
 --------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+TODO
 
 Dependencies
 ------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+none
 
 Example Playbook
 ----------------
+```yaml
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
+    - hosts: pxe_servers
+      vars:
+      tftp_pxe_mainmenu:
+        - name: "Hardware diagnostics & tools"
+          file: hardware
+          images:
+          - name: "Western Digital Data Lifeguard Diagnostic 5.22"
+            url: "https://dl.dropboxusercontent.com/u/83439503/iso"
+            filename: "wddiag522.img"
+            kernel: memdisk
+            append: iso raw
+            initrd: "pxe_images/wddiag522.img"
+          - name: "Memtest86+ v7.2" 
+            url: "https://dl.dropboxusercontent.com/u/83439503/iso"
+            filename: "Memtest86-7.2.iso"
+            kernel: memdisk
+            append: iso raw
+            initrd: "pxe_images/Memtest86-7.2.iso"
+        - name: "(Live/Install) OS"
+          file: os
+          images:
+            - name: "mfsBSD 11.0-RELEASE amd64 (user:root pwd:mfsroot)"
+              url: "http://mfsbsd.vx.sk/files/iso/11/amd64"
+              filename: "mfsbsd-11.0-RELEASE-amd64.iso"
+              kernel: "memdisk"
+              append: "raw initrd=pxe_images/mfsbsd-11.0-RELEASE-amd64.iso iso"         
       roles:
-         - { role: username.rolename, x: 42 }
+         - { role: ansible.tftp-pxelinux }
+```
 
 License
 -------
-
 BSD
 
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
